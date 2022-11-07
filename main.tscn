@@ -1,0 +1,94 @@
+[gd_scene load_steps=16 format=3 uid="uid://bl4ms4bgtckxa"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_0v8pw"]
+[ext_resource type="PackedScene" uid="uid://cmx3ucbbmfhst" path="res://mirror.tscn" id="2_pgon2"]
+[ext_resource type="PackedScene" uid="uid://crh7dm5qu21dk" path="res://model/face.glb" id="2_qb14i"]
+[ext_resource type="Shader" path="res://mirror.gdshader" id="3_juv21"]
+[ext_resource type="PackedScene" uid="uid://d0fd0ase6s05e" path="res://model/hand.glb" id="3_yol25"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_tof6j"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_if6ys"]
+
+[sub_resource type="Sky" id="Sky_rgjpf"]
+sky_material = SubResource("PhysicalSkyMaterial_if6ys")
+
+[sub_resource type="Environment" id="Environment_xekvo"]
+background_mode = 2
+sky = SubResource("Sky_rgjpf")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_f4mxx"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wrjoy"]
+fractal_type = 3
+domain_warp_enabled = true
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2leca"]
+seamless = true
+noise = SubResource("FastNoiseLite_wrjoy")
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_t43rp"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_wrjoy")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xg8y5"]
+albedo_color = Color(0.643137, 0.635294, 0.454902, 1)
+albedo_texture = SubResource("NoiseTexture2D_2leca")
+normal_enabled = true
+normal_texture = SubResource("NoiseTexture2D_t43rp")
+uv1_scale = Vector3(16, 16, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7gq70"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_juv21")
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_0v8pw")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.686267, 0)
+current = true
+
+[node name="face" parent="XROrigin3D/XRCamera3D" instance=ExtResource("2_qb14i")]
+transform = Transform3D(-1.78584, 0, -1.56123e-07, 0, 1.78584, 0, 1.56123e-07, 0, -1.78584, 0, -0.033906, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRCamera3D"]
+transform = Transform3D(0.505599, 0, 0, 0, 0.505599, 0, 0, 0, 0.505599, 0, 0, 0)
+visible = false
+mesh = SubResource("SphereMesh_tof6j")
+
+[node name="XRController3D_Left" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.303486, 0)
+tracker = &"left_hand"
+
+[node name="hand" parent="XROrigin3D/XRController3D_Left" instance=ExtResource("3_yol25")]
+transform = Transform3D(1.04015, -1.70374, -0.123903, 0.0419088, -0.11957, 1.99598, 1.70773, 1.04066, 0.0264844, 0, -0.0338245, 0.210464)
+
+[node name="XRController3D_Right" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.303486, 0)
+tracker = &"right_hand"
+
+[node name="hand" parent="XROrigin3D/XRController3D_Right" instance=ExtResource("3_yol25")]
+transform = Transform3D(-1.04015, 1.70374, 0.123903, 0.0419087, -0.11957, 1.99598, 1.70773, 1.04066, 0.0264846, 0, -0.0338245, 0.210464)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xekvo")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(132.312, 0, 0, 0, 132.312, 0, 0, 0, 132.312, 0, 0, 0)
+mesh = SubResource("PlaneMesh_f4mxx")
+skeleton = NodePath("../XROrigin3D")
+surface_material_override/0 = SubResource("StandardMaterial3D_xg8y5")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground"]
+transform = Transform3D(0.00755789, 0, 0, 0, 0.00377895, 0.00654533, 0, -0.00654533, 0.00377895, 0.902896, 0.583564, 0)
+light_energy = 2.455
+
+[node name="Mirror" parent="." node_paths=PackedStringArray("origin") instance=ExtResource("2_pgon2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0509434, 0.438828, -1.19729)
+surface_material_override/0 = SubResource("ShaderMaterial_7gq70")
+origin = NodePath("../XROrigin3D")

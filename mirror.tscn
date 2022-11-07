@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://cmx3ucbbmfhst"]
+
+[ext_resource type="Script" path="res://mirror.gd" id="1_ifql8"]
+[ext_resource type="Shader" path="res://mirror.gdshader" id="1_y78wn"]
+[ext_resource type="Texture2D" uid="uid://fdw30w2odqwp" path="res://icon.svg" id="3_ny8lq"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_ply7g"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_munil"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_y78wn")
+
+[node name="Mirror" type="MeshInstance3D" node_paths=PackedStringArray("left_camera", "right_camera", "leftvp", "rightvp")]
+layers = 2
+mesh = SubResource("QuadMesh_ply7g")
+surface_material_override/0 = SubResource("ShaderMaterial_munil")
+script = ExtResource("1_ifql8")
+left_camera = NodePath("LeftViewport/Camera3D")
+right_camera = NodePath("RightViewport/Camera3D")
+leftvp = NodePath("LeftViewport")
+rightvp = NodePath("RightViewport")
+text = ExtResource("3_ny8lq")
+
+[node name="LeftViewport" type="SubViewport" parent="."]
+size = Vector2i(514, 514)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="LeftViewport"]
+cull_mask = 1048573
+size = 0.001
+
+[node name="RightViewport" type="SubViewport" parent="."]
+size = Vector2i(514, 514)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="RightViewport"]
+cull_mask = 1048573
+projection = 2
